@@ -26,21 +26,12 @@
 	const dispatch = createEventDispatcher()
 
 	// when aspect changes, we reset the cropSize
-	$: {
-		if (imgEl) {
-			cropSize = helpers.getCropSize(imgEl.width, imgEl.height, aspect)
-    }
+	$: if (imgEl) {
+		cropSize = helpers.getCropSize(imgEl.width, imgEl.height, aspect)
 	}
 
-	// when zoom changes, we recompute the crop
-	$: {
-		if(imageSize && cropSize) {
-			if(restrictPosition) {
-				helpers.restrictPosition(crop, imageSize, cropSize, zoom)
-			}
-			emitCropData()
-		}
-	}
+	// when zoom changes, we recompute the cropped area
+	$: zoom && emitCropData()
 
 	onMount(() => {
 		window.addEventListener('resize', computeSizes)
@@ -223,7 +214,7 @@
   }
 
 	const emitCropData = () => {
-    if (!cropSize) return
+    if (!cropSize || cropSize.width === 0) return
     // this is to ensure the crop is correctly restricted after a zoom back (https://github.com/ricardo-ch/react-easy-crop/issues/6)
     const position = restrictPosition
       ? helpers.restrictPosition(crop, imageSize, cropSize, zoom)

@@ -3,8 +3,6 @@
 	
 	let crop = { x: 0, y: 0}
 	let zoom = 1
-
-	setTimeout(() => zoom = 2, 1000)
 </script>
 
 <Cropper  
