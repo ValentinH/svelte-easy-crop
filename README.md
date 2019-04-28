@@ -106,7 +106,7 @@ Now, open `http://localhost:5000` and start hacking!
 [downloads-badge]: https://img.shields.io/npm/dm/svelte-easy-crop.svg?style=flat-square
 [npmstats]: http://npm-stat.com/charts.html?package=svelte-easy-crop&from=2018-06-18
 [npmstats-badge]: https://img.shields.io/npm/dm/svelte-easy-crop.svg?style=flat-square
-[gzip-badge]: http://img.badgesize.io/https://unpkg.com/svelte-easy-crop/dist/standalone/svelte-easy-crop.min.js?compression=gzip&style=flat-square
+[gzip-badge]: http://img.badgesize.io/https://unpkg.com/svelte-easy-crop@1.0.0/index.js?compression=gzip&style=flat-square
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
 [license]: https://github.com/ValentinH/svelte-easy-crop/blob/master/LICENSE
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
