@@ -28,7 +28,8 @@
     "e2e:ci": "start-server-and-test dev http://localhost:5000 cy:ci",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:ci": "cypress run --record"
+    "cy:ci": "cypress run --record",
+    "npm:publish": "np"
   },
   "devDependencies": {
     "@babel/core": "^7.3.4",
