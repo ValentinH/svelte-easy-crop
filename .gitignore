@@ -2,9 +2,10 @@
 node_modules
 yarn-error.log
 package-lock.json
-index.mjs
-index.js
+/index.mjs
+/index.js
 example/public/bundle.*
 cypress/fixtures
 cypress/videos
 cypress/screenshots
+.yalc
