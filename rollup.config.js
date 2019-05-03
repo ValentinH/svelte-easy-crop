@@ -1,15 +1,19 @@
 import svelte from 'rollup-plugin-svelte'
 import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
 import pkg from './package.json'
+
+const input = 'src/index.svelte'
 
 export default [
   {
-    input: 'src/Cropper.svelte',
-    output: [
-      { file: pkg.module, format: 'es' },
-      { file: pkg.main, format: 'umd', name: 'Cropper' },
-    ],
-    plugins: [resolve(), svelte()],
+    input,
+    output: { file: pkg.main, format: 'umd', name: 'Cropper' },
+    plugins: [svelte(), resolve()],
+  },
+  {
+    input,
+    output: { file: pkg.module, format: 'es' },
+    external: ['svelte/internal'],
+    plugins: [svelte()],
   },
 ]

@@ -2,8 +2,8 @@
   "name": "svelte-easy-crop",
   "version": "1.0.0",
   "svelte": "src/Cropper.svelte",
-  "module": "index.mjs",
-  "main": "index.js",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
   "description": "A Svelte component to crop images with easy interactions",
   "homepage": "https://github.com/ValentinH/svelte-easy-crop",
   "repository": {
@@ -57,7 +57,6 @@
   ],
   "files": [
     "src",
-    "index.mjs",
-    "index.js"
+    "dist"
   ]
 }

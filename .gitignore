@@ -2,8 +2,7 @@
 node_modules
 yarn-error.log
 package-lock.json
-/index.mjs
-/index.js
+dist
 example/public/bundle.*
 cypress/fixtures
 cypress/videos

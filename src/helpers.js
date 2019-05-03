@@ -19,11 +19,11 @@ export function getCropSize(imgWidth, imgHeight, aspect) {
 
 /**
  * Ensure a new image position stays in the crop area.
- * @param {{x: number, y number}} position new x/y position requested for the image
+ * @param {{x: number, y: number}} position new x/y position requested for the image
  * @param {{width: number, height: number}} imageSize width/height of the src image
  * @param {{width: number, height: number}} cropSize width/height of the crop area
  * @param {number} zoom zoom value
- * @returns {{x: number, y number}}
+ * @returns {{x: number, y: number}}
  */
 export function restrictPosition(position, imageSize, cropSize, zoom) {
   return {
