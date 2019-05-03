@@ -111,5 +111,5 @@ Now, open `http://localhost:5000` and start hacking!
 [license]: https://github.com/ValentinH/svelte-easy-crop/blob/master/LICENSE
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prs]: http://makeapullrequest.com
-[build-badge]: https://travis-ci.org/ValentinH/svelte-easy-crop.svg?branch=master
-[build-page]: https://travis-ci.org/ValentinH/svelte-easy-crop
+[build-badge]: https://circleci.com/gh/ValentinH/svelte-easy-crop.svg?style=svg
+[build-page]: https://circleci.com/gh/ValentinH/svelte-easy-crop
