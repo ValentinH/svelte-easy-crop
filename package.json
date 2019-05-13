@@ -1,6 +1,6 @@
 {
   "name": "svelte-easy-crop",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "svelte": "src/index.svelte",
   "module": "dist/index.mjs",
   "main": "dist/index.js",
