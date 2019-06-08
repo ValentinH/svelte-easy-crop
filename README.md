@@ -8,6 +8,10 @@ This is a rewrite of `react-easy-crop` (https://github.com/ricardo-ch/react-easy
 
 ![svelte-easy-crop Demo](https://user-images.githubusercontent.com/2678610/41561426-365e7a44-734a-11e8-8e0e-1c04251f53e4.gif)
 
+## Demo
+
+https://svelte.dev/repl/a6fc511aafd94e428d0bb6670f477abc?version=3.4.4
+
 ## Features
 
 - Supports drag and zoom interactions
