@@ -51,7 +51,7 @@
     "svelte": "^3.29.0"
   },
   "engines": {
-    "node": "14.15.1"
+    "node": "14"
   },
   "keywords": [
     "svelte",
