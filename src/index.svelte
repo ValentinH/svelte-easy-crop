@@ -1,244 +1,262 @@
 <script>
-	import { onMount, onDestroy, createEventDispatcher } from 'svelte'
-	import * as helpers from './helpers'
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte'
+  import * as helpers from './helpers'
 
-	export let image
-	export let crop = { x: 0, y: 0 }
-	export let zoom = 1
-	export let aspect = 4 / 3
-	export let minZoom = 1
-	export let maxZoom = 3
-	export let cropSize = null
-	export let cropShape = 'rect'
-	export let showGrid = true
-	export let zoomSpeed = 1
-	export let crossOrigin = null
-	export let restrictPosition = true
+  export let image
+  export let crop = { x: 0, y: 0 }
+  export let zoom = 1
+  export let aspect = 4 / 3
+  export let minZoom = 1
+  export let maxZoom = 3
+  export let cropSize = null
+  export let cropShape = 'rect'
+  export let showGrid = true
+  export let zoomSpeed = 1
+  export let crossOrigin = null
+  export let restrictPosition = true
 
-	let cropperSize = null
-	let imageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
-	let containerEl = null
-	let containerRect = null
-	let imgEl = null
-	let dragStartPosition = { x: 0, y: 0 }
-	let dragStartCrop = { x: 0, y: 0 }
-	let lastPinchDistance = 0
-	let rafDragTimeout = null
-	let rafZoomTimeout = null
+  let cropperSize = null
+  let imageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
+  let containerEl = null
+  let containerRect = null
+  let imgEl = null
+  let dragStartPosition = { x: 0, y: 0 }
+  let dragStartCrop = { x: 0, y: 0 }
+  let lastPinchDistance = 0
+  let rafDragTimeout = null
+  let rafZoomTimeout = null
+  let isDragging = false
 
-	const dispatch = createEventDispatcher()
+  let dispatch = createEventDispatcher()
 
-	onMount(() => {
-	  window.addEventListener('resize', computeSizes)
-	  containerEl.addEventListener('wheel', onWheel, { passive: false })
-	  containerEl.addEventListener('gesturestart', preventZoomSafari)
-	  containerEl.addEventListener('gesturechange', preventZoomSafari)
+  onMount(() => {
+    // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
+    if (imgEl && imgEl.complete) {
+      onImgLoad()
+    }
+  })
 
-	  // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
-	  if (imgEl && imgEl.complete) {
-	    onImgLoad()
-	  }
-	})
+  onDestroy(() => {
+    dispatch = null
+  })
 
-	onDestroy(() => {
-	  window.removeEventListener('resize', computeSizes)
-	  containerEl.removeEventListener('wheel', onWheel)
-	  containerEl.removeEventListener('gesturestart', preventZoomSafari)
-	  containerEl.removeEventListener('gesturechange', preventZoomSafari)
-	  cleanEvents()
-	})
+  const onImgLoad = () => {
+    computeSizes()
+    emitCropData()
+  }
 
-	// this is to prevent Safari on iOS >= 10 to zoom the page
-	const preventZoomSafari = e => e.preventDefault()
+  const getAspect = () => {
+    if (cropSize) {
+      return cropSize.width / cropSize.height
+    }
+    return aspect
+  }
 
-	const cleanEvents = () => {
-	  document.removeEventListener('mousemove', onMouseMove)
-	  document.removeEventListener('mouseup', onDragStopped)
-	  document.removeEventListener('touchmove', onTouchMove)
-	  document.removeEventListener('touchend', onDragStopped)
-	}
+  const computeSizes = () => {
+    if (imgEl) {
+      imageSize = {
+        width: imgEl.width,
+        height: imgEl.height,
+        naturalWidth: imgEl.naturalWidth,
+        naturalHeight: imgEl.naturalHeight,
+      }
+      cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
+    }
+    if (containerEl) {
+      containerRect = containerEl.getBoundingClientRect()
+    }
+  }
 
-	const onImgLoad = () => {
-	  computeSizes()
-	  emitCropData()
-	}
+  const getMousePoint = e => ({ x: Number(e.clientX), y: Number(e.clientY) })
 
-	const getAspect = () => {
-	  if (cropSize) {
-	    return cropSize.width / cropSize.height
-	  }
-	  return aspect
-	}
+  const getTouchPoint = touch => ({
+    x: Number(touch.clientX),
+    y: Number(touch.clientY),
+  })
 
-	const computeSizes = () => {
-	  if (imgEl) {
-	    imageSize = {
-	      width: imgEl.width,
-	      height: imgEl.height,
-	      naturalWidth: imgEl.naturalWidth,
-	      naturalHeight: imgEl.naturalHeight,
-	    }
-	    cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
-	  }
-	  if (containerEl) {
-	    containerRect = containerEl.getBoundingClientRect()
-	  }
-	}
+  const onMouseDown = e => {
+    isDragging = true
+    onDragStart(getMousePoint(e))
+  }
 
-	const getMousePoint = e => ({ x: Number(e.clientX), y: Number(e.clientY) })
+  const onMouseMove = e => {
+    if (!isDragging) {
+      return
+    }
 
-	const getTouchPoint = touch => ({
-	  x: Number(touch.clientX),
-	  y: Number(touch.clientY),
-	})
+    onDrag(getMousePoint(e))
+  }
 
-	const onMouseDown = e => {
-	  e.preventDefault()
-	  document.addEventListener('mousemove', onMouseMove)
-	  document.addEventListener('mouseup', onDragStopped)
-	  onDragStart(getMousePoint(e))
-	}
+  const onTouchStart = e => {
+    if (e.touches.length === 2) {
+      onPinchStart(e)
+    } else if (e.touches.length === 1) {
+      onDragStart(getTouchPoint(e.touches[0]))
+    }
+  }
 
-	const onMouseMove = e => onDrag(getMousePoint(e))
+  const onTouchMove = e => {
+    isDragging = true
+    // Prevent whole page from scrolling on iOS.
+    if (e.touches.length === 2) {
+      onPinchMove(e)
+    } else if (e.touches.length === 1) {
+      onDrag(getTouchPoint(e.touches[0]))
+    }
+  }
 
-	const onTouchStart = e => {
-	  e.preventDefault()
-	  document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
-	  document.addEventListener('touchend', onDragStopped)
-	  if (e.touches.length === 2) {
-	    onPinchStart(e)
-	  } else if (e.touches.length === 1) {
-	    onDragStart(getTouchPoint(e.touches[0]))
-	  }
-	}
+  const onDragStart = ({ x, y }) => {
+    dragStartPosition = { x, y }
+    dragStartCrop = { x: crop.x, y: crop.y }
+  }
 
-	const onTouchMove = e => {
-	  // Prevent whole page from scrolling on iOS.
-	  e.preventDefault()
-	  if (e.touches.length === 2) {
-	    onPinchMove(e)
-	  } else if (e.touches.length === 1) {
-	    onDrag(getTouchPoint(e.touches[0]))
-	  }
-	}
+  const onDrag = ({ x, y }) => {
+    if (rafDragTimeout) window.cancelAnimationFrame(rafDragTimeout)
 
-	const onDragStart = ({ x, y }) => {
-	  dragStartPosition = { x, y }
-	  dragStartCrop = { x: crop.x, y: crop.y }
-	}
+    rafDragTimeout = window.requestAnimationFrame(() => {
+      if (x === undefined || y === undefined) return
+      const offsetX = x - dragStartPosition.x
+      const offsetY = y - dragStartPosition.y
+      const requestedPosition = {
+        x: dragStartCrop.x + offsetX,
+        y: dragStartCrop.y + offsetY,
+      }
 
-	const onDrag = ({ x, y }) => {
-	  if (rafDragTimeout) window.cancelAnimationFrame(rafDragTimeout)
+      crop = restrictPosition
+        ? helpers.restrictPosition(requestedPosition, imageSize, cropperSize, zoom)
+        : requestedPosition
+    })
+  }
 
-	  rafDragTimeout = window.requestAnimationFrame(() => {
-	    if (x === undefined || y === undefined) return
-	    const offsetX = x - dragStartPosition.x
-	    const offsetY = y - dragStartPosition.y
-	    const requestedPosition = {
-	      x: dragStartCrop.x + offsetX,
-	      y: dragStartCrop.y + offsetY,
-	    }
+  const onDragStopped = () => {
+    isDragging = false
+    emitCropData()
+  }
 
-	    crop = restrictPosition
-	      ? helpers.restrictPosition(requestedPosition, imageSize, cropperSize, zoom)
-	      : requestedPosition
-	  })
-	}
+  const onPinchStart = e => {
+    const pointA = getTouchPoint(e.touches[0])
+    const pointB = getTouchPoint(e.touches[1])
+    lastPinchDistance = helpers.getDistanceBetweenPoints(pointA, pointB)
+    onDragStart(helpers.getCenter(pointA, pointB))
+  }
 
-	const onDragStopped = () => {
-	  cleanEvents()
-	  emitCropData()
-	}
+  const onPinchMove = e => {
+    const pointA = getTouchPoint(e.touches[0])
+    const pointB = getTouchPoint(e.touches[1])
+    const center = helpers.getCenter(pointA, pointB)
+    onDrag(center)
 
-	const onPinchStart = e => {
-	  const pointA = getTouchPoint(e.touches[0])
-	  const pointB = getTouchPoint(e.touches[1])
-	  lastPinchDistance = helpers.getDistanceBetweenPoints(pointA, pointB)
-	  onDragStart(helpers.getCenter(pointA, pointB))
-	}
+    if (rafZoomTimeout) window.cancelAnimationFrame(rafZoomTimeout)
+    rafZoomTimeout = window.requestAnimationFrame(() => {
+      const distance = helpers.getDistanceBetweenPoints(pointA, pointB)
+      const newZoom = zoom * (distance / lastPinchDistance)
+      setNewZoom(newZoom, center)
+      lastPinchDistance = distance
+    })
+  }
 
-	const onPinchMove = e => {
-	  const pointA = getTouchPoint(e.touches[0])
-	  const pointB = getTouchPoint(e.touches[1])
-	  const center = helpers.getCenter(pointA, pointB)
-	  onDrag(center)
+  const onWheel = e => {
+    const point = getMousePoint(e)
+    const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
+    setNewZoom(newZoom, point)
+  }
 
-	  if (rafZoomTimeout) window.cancelAnimationFrame(rafZoomTimeout)
-	  rafZoomTimeout = window.requestAnimationFrame(() => {
-	    const distance = helpers.getDistanceBetweenPoints(pointA, pointB)
-	    const newZoom = zoom * (distance / lastPinchDistance)
-	    setNewZoom(newZoom, center)
-	    lastPinchDistance = distance
-	  })
-	}
+  const getPointOnContainer = ({ x, y }) => {
+    if (!containerRect) {
+      throw new Error('The Cropper is not mounted')
+    }
+    return {
+      x: containerRect.width / 2 - (x - containerRect.left),
+      y: containerRect.height / 2 - (y - containerRect.top),
+    }
+  }
 
-	const onWheel = e => {
-	  e.preventDefault()
-	  const point = getMousePoint(e)
-	  const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
-	  setNewZoom(newZoom, point)
-	}
+  const getPointOnImage = ({ x, y }) => ({
+    x: (x + crop.x) / zoom,
+    y: (y + crop.y) / zoom,
+  })
 
-	const getPointOnContainer = ({ x, y }) => {
-	  if (!containerRect) {
-	    throw new Error('The Cropper is not mounted')
-	  }
-	  return {
-	    x: containerRect.width / 2 - (x - containerRect.left),
-	    y: containerRect.height / 2 - (y - containerRect.top),
-	  }
-	}
+  const setNewZoom = (newZoom, point) => {
+    const zoomPoint = getPointOnContainer(point)
+    const zoomTarget = getPointOnImage(zoomPoint)
+    zoom = Math.min(maxZoom, Math.max(newZoom, minZoom))
 
-	const getPointOnImage = ({ x, y }) => ({
-	  x: (x + crop.x) / zoom,
-	  y: (y + crop.y) / zoom,
-	})
+    const requestedPosition = {
+      x: zoomTarget.x * zoom - zoomPoint.x,
+      y: zoomTarget.y * zoom - zoomPoint.y,
+    }
+    crop = restrictPosition
+      ? helpers.restrictPosition(requestedPosition, imageSize, cropperSize, zoom)
+      : requestedPosition
+  }
 
-	const setNewZoom = (newZoom, point) => {
-	  const zoomPoint = getPointOnContainer(point)
-	  const zoomTarget = getPointOnImage(zoomPoint)
-	  zoom = Math.min(maxZoom, Math.max(newZoom, minZoom))
+  const emitCropData = () => {
+    if (!cropperSize || cropperSize.width === 0) return
+    // this is to ensure the crop is correctly restricted after a zoom back (https://github.com/ricardo-ch/svelte-easy-crop/issues/6)
+    const position = restrictPosition
+      ? helpers.restrictPosition(crop, imageSize, cropperSize, zoom)
+      : crop
+    const { croppedAreaPercentages, croppedAreaPixels } = helpers.computeCroppedArea(
+      position,
+      imageSize,
+      cropperSize,
+      getAspect(),
+      zoom,
+      restrictPosition
+    )
 
-	  const requestedPosition = {
-	    x: zoomTarget.x * zoom - zoomPoint.x,
-	    y: zoomTarget.y * zoom - zoomPoint.y,
-	  }
-	  crop = restrictPosition
-	    ? helpers.restrictPosition(requestedPosition, imageSize, cropperSize, zoom)
-	    : requestedPosition
-	}
+    dispatch('cropcomplete', {
+      percent: croppedAreaPercentages,
+      pixels: croppedAreaPixels,
+    })
+  }
 
-	const emitCropData = () => {
-	  if (!cropperSize || cropperSize.width === 0) return
-	  // this is to ensure the crop is correctly restricted after a zoom back (https://github.com/ricardo-ch/svelte-easy-crop/issues/6)
-	  const position = restrictPosition
-	    ? helpers.restrictPosition(crop, imageSize, cropperSize, zoom)
-	    : crop
-	  const { croppedAreaPercentages, croppedAreaPixels } = helpers.computeCroppedArea(
-	    position,
-	    imageSize,
-	    cropperSize,
-	    getAspect(),
-	    zoom,
-	    restrictPosition
-	  )
+  // ------ Reactive statement ------
+  //when aspect changes, we reset the cropperSize
+  $: if (imgEl) {
+    cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
+  }
 
-	  dispatch('cropcomplete', {
-	    percent: croppedAreaPercentages,
-	    pixels: croppedAreaPixels,
-	  })
-	}
-
-	// ------ Reactive statement ------
-
-	//when aspect changes, we reset the cropperSize
-	$: if (imgEl) {
-	  cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
-	}
-
-	// when zoom changes, we recompute the cropped area
-	$: zoom && emitCropData()
+  // when zoom changes, we recompute the cropped area
+  $: zoom && emitCropData()
 </script>
+
+<svelte:window
+  on:resize={computeSizes}
+  on:mousemove={onMouseMove}
+  on:mouseup|capture={onDragStopped}
+  on:touchmove|nonpassive|preventDefault={onTouchMove}
+  on:touchend={onDragStopped}
+/>
+<div
+  class="container"
+  bind:this={containerEl}
+  on:mousedown|preventDefault={onMouseDown}
+  on:touchstart|preventDefault={onTouchStart}
+  on:wheel|preventDefault={onWheel}
+  on:gesturestart|preventDefault
+  on:gesturechange|preventDefault
+  data-testid="container"
+>
+  <img
+    bind:this={imgEl}
+    class="image"
+    src={image}
+    on:load={onImgLoad}
+    alt=""
+    style="transform: translate({crop.x}px, {crop.y}px) scale({zoom});"
+    crossorigin={crossOrigin}
+  />
+  {#if cropperSize}
+    <div
+      class="cropperArea"
+      class:round={cropShape === 'round'}
+      class:grid={showGrid}
+      style="width: {cropperSize.width}px; height: {cropperSize.height}px;"
+      data-testid="cropper"
+    />
+  {/if}
+</div>
 
 <style>
   .container {
@@ -306,31 +324,4 @@
   .round {
     border-radius: 50%;
   }
-</style> 
-
-<div
-	class="container"
-	bind:this={containerEl}
-	on:mousedown={onMouseDown}
-	on:touchstart={onTouchStart}
-	data-testid="container"
->
-	<img
-		bind:this={imgEl}
-		class="image"
-		src={image}
-		on:load={onImgLoad}
-		alt=""
-		style="transform: translate({crop.x}px, {crop.y}px) scale({zoom});"
-		crossorigin={crossOrigin}
-	/>
-	{#if cropperSize}
-		<div
-			class="cropperArea"
-			class:round={cropShape === 'round'}
-			class:grid={showGrid}
-			style="width: {cropperSize.width}px; height: {cropperSize.height}px;"
-			data-testid="cropper"
-		></div>
-	{/if}
-</div>
+</style>
