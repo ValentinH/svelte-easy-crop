@@ -75,7 +75,6 @@
   })
 
   const onMouseDown = e => {
-    isDragging = true
     onDragStart(getMousePoint(e))
   }
 
@@ -96,7 +95,10 @@
   }
 
   const onTouchMove = e => {
-    isDragging = true
+    if (!isDragging) {
+      return
+    }
+    
     // Prevent whole page from scrolling on iOS.
     if (e.touches.length === 2) {
       onPinchMove(e)
@@ -106,6 +108,7 @@
   }
 
   const onDragStart = ({ x, y }) => {
+    isDragging = true;
     dragStartPosition = { x, y }
     dragStartCrop = { x: crop.x, y: crop.y }
   }
