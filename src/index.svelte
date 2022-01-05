@@ -25,9 +25,8 @@
   let lastPinchDistance = 0
   let rafDragTimeout = null
   let rafZoomTimeout = null
-  let isDragging = false
 
-  let dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher()
 
   onMount(() => {
     // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
@@ -37,8 +36,15 @@
   })
 
   onDestroy(() => {
-    dispatch = null
+    cleanEvents()
   })
+
+  const cleanEvents = () => {
+    document.removeEventListener('mousemove', onMouseMove)
+    document.removeEventListener('mouseup', onDragStopped)
+    document.removeEventListener('touchmove', onTouchMove)
+    document.removeEventListener('touchend', onDragStopped)
+  }
 
   const onImgLoad = () => {
     computeSizes()
@@ -75,19 +81,17 @@
   })
 
   const onMouseDown = e => {
-    isDragging = true
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onDragStopped)
     onDragStart(getMousePoint(e))
   }
 
-  const onMouseMove = e => {
-    if (!isDragging) {
-      return
-    }
-
-    onDrag(getMousePoint(e))
-  }
+  const onMouseMove = e => onDrag(getMousePoint(e))
 
   const onTouchStart = e => {
+    document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
+    document.addEventListener('touchend', onDragStopped)
+
     if (e.touches.length === 2) {
       onPinchStart(e)
     } else if (e.touches.length === 1) {
@@ -96,8 +100,8 @@
   }
 
   const onTouchMove = e => {
-    isDragging = true
     // Prevent whole page from scrolling on iOS.
+    e.preventDefault()
     if (e.touches.length === 2) {
       onPinchMove(e)
     } else if (e.touches.length === 1) {
@@ -129,7 +133,7 @@
   }
 
   const onDragStopped = () => {
-    isDragging = false
+    cleanEvents()
     emitCropData()
   }
 
@@ -221,13 +225,7 @@
   $: zoom && emitCropData()
 </script>
 
-<svelte:window
-  on:resize={computeSizes}
-  on:mousemove={onMouseMove}
-  on:mouseup|capture={onDragStopped}
-  on:touchmove|nonpassive|preventDefault={onTouchMove}
-  on:touchend={onDragStopped}
-/>
+<svelte:window on:resize={computeSizes} />
 <div
   class="container"
   bind:this={containerEl}
