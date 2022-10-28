@@ -40,10 +40,12 @@
   })
 
   const cleanEvents = () => {
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onDragStopped)
-    document.removeEventListener('touchmove', onTouchMove)
-    document.removeEventListener('touchend', onDragStopped)
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onDragStopped)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onDragStopped)
+    }
   }
 
   const onImgLoad = () => {
