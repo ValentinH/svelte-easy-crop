@@ -1,43 +1,56 @@
-<script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte'
+<script lang="ts">
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import type { HTMLImgAttributes } from 'svelte/elements/index'
   import * as helpers from './helpers'
+  import type { Point, CropShape, CropSize, DispatchEvents, ImageSize } from './types'
 
-  export let image
-  export let crop = { x: 0, y: 0 }
-  export let zoom = 1
-  export let aspect = 4 / 3
-  export let minZoom = 1
-  export let maxZoom = 3
-  export let cropSize = null
-  export let cropShape = 'rect'
-  export let showGrid = true
-  export let zoomSpeed = 1
-  export let crossOrigin = null
-  export let restrictPosition = true
+  export let image: string
+  export let crop: Point = { x: 0, y: 0 }
+  export let zoom: number = 1
+  export let aspect: number = 4 / 3
+  export let minZoom: number = 1
+  export let maxZoom: number = 3
+  export let cropSize: CropSize | null = null
+  export let cropShape: CropShape = 'rect'
+  export let showGrid: boolean = true
+  export let zoomSpeed: number = 1
+  export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
+  export let restrictPosition: boolean = true
 
-  let cropperSize = null
-  let imageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
-  let containerEl = null
-  let containerRect = null
-  let imgEl = null
-  let dragStartPosition = { x: 0, y: 0 }
-  let dragStartCrop = { x: 0, y: 0 }
+  let cropperSize: CropSize | null = null
+  let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
+  let containerEl: HTMLDivElement | null = null
+  let containerRect: DOMRect | null = null
+  let imgEl: HTMLImageElement | null = null
+  let dragStartPosition: Point = { x: 0, y: 0 }
+  let dragStartCrop: Point = { x: 0, y: 0 }
   let lastPinchDistance = 0
-  let rafDragTimeout = null
-  let rafZoomTimeout = null
+  let rafDragTimeout: number | null = null
+  let rafZoomTimeout: number | null = null
 
-  const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher<DispatchEvents>()
 
   onMount(() => {
     // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
     if (imgEl && imgEl.complete) {
       onImgLoad()
     }
+    if (containerEl) {
+      containerEl.addEventListener('gesturestart', preventZoomSafari)
+      containerEl.addEventListener('gesturechange', preventZoomSafari)
+    }
   })
 
   onDestroy(() => {
+    if (containerEl) {
+      containerEl.removeEventListener('gesturestart', preventZoomSafari)
+      containerEl.removeEventListener('gesturechange', preventZoomSafari)
+    }
     cleanEvents()
   })
+
+  // this is to prevent Safari on iOS >= 10 to zoom the page
+  const preventZoomSafari = (e: Event) => e.preventDefault()
 
   const cleanEvents = () => {
     if (typeof document !== 'undefined') {
@@ -75,22 +88,25 @@
     }
   }
 
-  const getMousePoint = e => ({ x: Number(e.clientX), y: Number(e.clientY) })
+  const getMousePoint = (e: MouseEvent) => ({
+    x: Number(e.clientX),
+    y: Number(e.clientY),
+  })
 
-  const getTouchPoint = touch => ({
+  const getTouchPoint = (touch: TouchEvent['touches'][0]) => ({
     x: Number(touch.clientX),
     y: Number(touch.clientY),
   })
 
-  const onMouseDown = e => {
+  const onMouseDown = (e: MouseEvent) => {
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onDragStopped)
     onDragStart(getMousePoint(e))
   }
 
-  const onMouseMove = e => onDrag(getMousePoint(e))
+  const onMouseMove = (e: MouseEvent) => onDrag(getMousePoint(e))
 
-  const onTouchStart = e => {
+  const onTouchStart = (e: TouchEvent) => {
     document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
     document.addEventListener('touchend', onDragStopped)
 
@@ -101,7 +117,7 @@
     }
   }
 
-  const onTouchMove = e => {
+  const onTouchMove = (e: TouchEvent) => {
     // Prevent whole page from scrolling on iOS.
     e.preventDefault()
     if (e.touches.length === 2) {
@@ -111,16 +127,16 @@
     }
   }
 
-  const onDragStart = ({ x, y }) => {
+  const onDragStart = ({ x, y }: Point) => {
     dragStartPosition = { x, y }
     dragStartCrop = { x: crop.x, y: crop.y }
   }
 
-  const onDrag = ({ x, y }) => {
+  const onDrag = ({ x, y }: Point) => {
     if (rafDragTimeout) window.cancelAnimationFrame(rafDragTimeout)
 
     rafDragTimeout = window.requestAnimationFrame(() => {
-      if (x === undefined || y === undefined) return
+      if (x === undefined || y === undefined || !cropperSize) return
       const offsetX = x - dragStartPosition.x
       const offsetY = y - dragStartPosition.y
       const requestedPosition = {
@@ -139,14 +155,14 @@
     emitCropData()
   }
 
-  const onPinchStart = e => {
+  const onPinchStart = (e: { touches: any }) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     lastPinchDistance = helpers.getDistanceBetweenPoints(pointA, pointB)
     onDragStart(helpers.getCenter(pointA, pointB))
   }
 
-  const onPinchMove = e => {
+  const onPinchMove = (e: { preventDefault?: () => void; touches: any }) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     const center = helpers.getCenter(pointA, pointB)
@@ -161,13 +177,13 @@
     })
   }
 
-  const onWheel = e => {
+  const onWheel = (e: WheelEvent) => {
     const point = getMousePoint(e)
     const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
     setNewZoom(newZoom, point)
   }
 
-  const getPointOnContainer = ({ x, y }) => {
+  const getPointOnContainer = ({ x, y }: Point) => {
     if (!containerRect) {
       throw new Error('The Cropper is not mounted')
     }
@@ -177,12 +193,13 @@
     }
   }
 
-  const getPointOnImage = ({ x, y }) => ({
+  const getPointOnImage = ({ x, y }: Point) => ({
     x: (x + crop.x) / zoom,
     y: (y + crop.y) / zoom,
   })
 
-  const setNewZoom = (newZoom, point) => {
+  const setNewZoom = (newZoom: number, point: Point) => {
+    if (!cropperSize) return
     const zoomPoint = getPointOnContainer(point)
     const zoomTarget = getPointOnImage(zoomPoint)
     zoom = Math.min(maxZoom, Math.max(newZoom, minZoom))
@@ -234,8 +251,6 @@
   on:mousedown|preventDefault={onMouseDown}
   on:touchstart|preventDefault={onTouchStart}
   on:wheel|preventDefault={onWheel}
-  on:gesturestart|preventDefault
-  on:gesturechange|preventDefault
   data-testid="container"
 >
   <img

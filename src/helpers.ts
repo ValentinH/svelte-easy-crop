@@ -1,10 +1,12 @@
+import type { CropSize, ImageSize, Point } from './types'
+
 /**
  * Compute the dimension of the crop area based on image size and aspect ratio
- * @param {number} imgWidth width of the src image in pixels
- * @param {number} imgHeight height of the src image in pixels
- * @param {number} aspect aspect ratio of the crop
+ * @param imgWidth width of the src image in pixels
+ * @param imgHeight height of the src image in pixels
+ * @param aspect aspect ratio of the crop
  */
-export function getCropSize(imgWidth, imgHeight, aspect) {
+export function getCropSize(imgWidth: number, imgHeight: number, aspect: number) {
   if (imgWidth >= imgHeight * aspect) {
     return {
       width: imgHeight * aspect,
@@ -19,39 +21,56 @@ export function getCropSize(imgWidth, imgHeight, aspect) {
 
 /**
  * Ensure a new image position stays in the crop area.
- * @param {{x: number, y: number}} position new x/y position requested for the image
- * @param {{width: number, height: number}} imageSize width/height of the src image
- * @param {{width: number, height: number}} cropSize width/height of the crop area
- * @param {number} zoom zoom value
- * @returns {{x: number, y: number}}
+ * @param position new x/y position requested for the image
+ * @param imageSize width/height of the src image
+ * @param cropSize width/height of the crop area
+ * @param  zoom zoom value
+ * @returns
  */
-export function restrictPosition(position, imageSize, cropSize, zoom) {
+export function restrictPosition(
+  position: Point,
+  imageSize: ImageSize,
+  cropSize: CropSize,
+  zoom: number
+): Point {
   return {
     x: restrictPositionCoord(position.x, imageSize.width, cropSize.width, zoom),
     y: restrictPositionCoord(position.y, imageSize.height, cropSize.height, zoom),
   }
 }
 
-function restrictPositionCoord(position, imageSize, cropSize, zoom) {
+function restrictPositionCoord(
+  position: number,
+  imageSize: number,
+  cropSize: number,
+  zoom: number
+) {
   const maxPosition = (imageSize * zoom) / 2 - cropSize / 2
   return Math.min(maxPosition, Math.max(position, -maxPosition))
 }
 
-export function getDistanceBetweenPoints(pointA, pointB) {
+export function getDistanceBetweenPoints(pointA: Point, pointB: Point) {
   return Math.sqrt(Math.pow(pointA.y - pointB.y, 2) + Math.pow(pointA.x - pointB.x, 2))
 }
 
 /**
  * Compute the output cropped area of the image in percentages and pixels.
  * x/y are the top-left coordinates on the src image
- * @param {{x: number, y number}} crop x/y position of the current center of the image
- * @param {{width: number, height: number, naturalWidth: number, naturelHeight: number}} imageSize width/height of the src image (default is size on the screen, natural is the original size)
- * @param {{width: number, height: number}} cropSize width/height of the crop area
- * @param {number} aspect aspect value
- * @param {number} zoom zoom value
- * @param {boolean} restrictPosition whether we should limit or not the cropped area
+ * @param  crop x/y position of the current center of the image
+ * @param  imageSize width/height of the src image (default is size on the screen, natural is the original size)
+ * @param  cropSize width/height of the crop area
+ * @param aspect aspect value
+ * @param zoom zoom value
+ * @param restrictPosition whether we should limit or not the cropped area
  */
-export function computeCroppedArea(crop, imgSize, cropSize, aspect, zoom, restrictPosition = true) {
+export function computeCroppedArea(
+  crop: Point,
+  imgSize: ImageSize,
+  cropSize: CropSize,
+  aspect: number,
+  zoom: number,
+  restrictPosition = true
+) {
   const limitAreaFn = restrictPosition ? limitArea : noOp
   const croppedAreaPercentages = {
     x: limitAreaFn(
@@ -110,25 +129,25 @@ export function computeCroppedArea(crop, imgSize, cropSize, aspect, zoom, restri
 
 /**
  * Ensure the returned value is between 0 and max
- * @param {number} max
- * @param {number} value
- * @param {boolean} shouldRound
+ * @param max
+ * @param value
+ * @param shouldRound
  */
-function limitArea(max, value, shouldRound = false) {
+function limitArea(max: number, value: number, shouldRound = false) {
   const v = shouldRound ? Math.round(value) : value
   return Math.min(max, Math.max(0, v))
 }
 
-function noOp(max, value) {
+function noOp(max: number, value: number) {
   return value
 }
 
 /**
  * Return the point that is the center of point a and b
- * @param {{x: number, y: number}} a
- * @param {{x: number, y: number}} b
+ * @param a
+ * @param b
  */
-export function getCenter(a, b) {
+export function getCenter(a: Point, b: Point) {
   return {
     x: (b.x + a.x) / 2,
     y: (b.y + a.y) / 2,
