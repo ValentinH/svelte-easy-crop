@@ -1,19 +1,20 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import * as helpers from './helpers'
-
-  export let image
-  export let crop = { x: 0, y: 0 }
-  export let zoom = 1
-  export let aspect = 4 / 3
-  export let minZoom = 1
-  export let maxZoom = 3
-  export let cropSize = null
-  export let cropShape = 'rect'
-  export let showGrid = true
-  export let zoomSpeed = 1
-  export let crossOrigin = null
-  export let restrictPosition = true
+  import { Crop, CropShape, CropSize } from '/src/cropper'
+  
+  export let image: string;
+  export let crop: Crop = { x: 0, y: 0 }
+  export let zoom: number | undefined = 1
+  export let aspect: number | undefined = 4 / 3
+  export let minZoom: number | undefined = 1
+  export let maxZoom: number | undefined = 3
+  export let cropSize: CropSize  = null
+  export let cropShape: CropShape = 'rect'
+  export let showGrid: boolean = true
+  export let zoomSpeed: number = 1
+  export let crossOrigin: string = null
+  export let restrictPosition: boolean = true
 
   let cropperSize = null
   let imageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
