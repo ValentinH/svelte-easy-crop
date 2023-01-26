@@ -4,6 +4,8 @@ import svelte from 'rollup-plugin-svelte'
 import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess'
 import pkg from './package.json'
 
+const production = !process.env.ROLLUP_WATCH
+
 export default {
   input: 'src/index.svelte',
   output: [
