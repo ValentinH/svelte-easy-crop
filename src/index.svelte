@@ -1,5 +1,5 @@
-<script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte'
+<script lang="ts">
+  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import * as helpers from './helpers'
 
   export let image
