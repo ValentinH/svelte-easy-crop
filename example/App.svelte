@@ -9,7 +9,7 @@
 	let image = urlArgs.img || '/images/dog.jpeg' // so we can change the image from our tests
 </script>
 
-<Cropper  
+<Cropper
 	{image}
 	bind:crop
 	bind:zoom
