@@ -1,7 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import svelte from 'rollup-plugin-svelte'
-import autoPreprocess from 'svelte-preprocess'
+import { sveltePreprocess } from 'svelte-preprocess/dist/autoProcess'
 import pkg from './package.json'
 
 export default {
@@ -11,7 +11,7 @@ export default {
     { file: pkg.main, format: 'umd', name: 'Cropper' },
   ],
   plugins: [
-    svelte({ preprocess: autoPreprocess() }),
+    svelte({ preprocess: sveltePreprocess({ typescript: true }) }),
     resolve(),
     typescript({ sourceMap: !production }),
   ],
