@@ -9,3 +9,5 @@ export interface Crop {
   x: number
   y: number
 }
+
+export type CrossOrigin = '' | 'anonymous' | 'use-credentials'

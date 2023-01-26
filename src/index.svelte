@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import * as helpers from './helpers'
-  import { Crop, CropShape, CropSize } from '/src/cropper'
+  import { Crop, CropShape, CropSize, CrossOrigin } from '/src/cropper'
   
   export let image: string;
   export let crop: Crop = { x: 0, y: 0 }
@@ -13,7 +13,7 @@
   export let cropShape: CropShape = 'rect'
   export let showGrid: boolean = true
   export let zoomSpeed: number = 1
-  export let crossOrigin: string = null
+  export let crossOrigin: CrossOrigin = null
   export let restrictPosition: boolean = true
 
   let cropperSize = null
@@ -76,22 +76,22 @@
     }
   }
 
-  const getMousePoint = e => ({ x: Number(e.clientX), y: Number(e.clientY) })
+  const getMousePoint = (e: { clientX: any; clientY: any }) => ({ x: Number(e.clientX), y: Number(e.clientY) })
 
-  const getTouchPoint = touch => ({
+  const getTouchPoint = (touch: { clientX: any; clientY: any }) => ({
     x: Number(touch.clientX),
     y: Number(touch.clientY),
   })
 
-  const onMouseDown = e => {
+  const onMouseDown = (e: { clientX: any; clientY: any }) => {
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onDragStopped)
     onDragStart(getMousePoint(e))
   }
 
-  const onMouseMove = e => onDrag(getMousePoint(e))
+  const onMouseMove = (e: { clientX: any; clientY: any }) => onDrag(getMousePoint(e))
 
-  const onTouchStart = e => {
+  const onTouchStart = (e: { touches: string | any[] }) => {
     document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
     document.addEventListener('touchend', onDragStopped)
 
@@ -102,7 +102,7 @@
     }
   }
 
-  const onTouchMove = e => {
+  const onTouchMove = (e: { preventDefault: () => void; touches: string | any[] }) => {
     // Prevent whole page from scrolling on iOS.
     e.preventDefault()
     if (e.touches.length === 2) {
@@ -140,14 +140,14 @@
     emitCropData()
   }
 
-  const onPinchStart = e => {
+  const onPinchStart = (e: { touches: any }) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     lastPinchDistance = helpers.getDistanceBetweenPoints(pointA, pointB)
     onDragStart(helpers.getCenter(pointA, pointB))
   }
 
-  const onPinchMove = e => {
+  const onPinchMove = (e: { preventDefault?: () => void; touches: any }) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     const center = helpers.getCenter(pointA, pointB)
@@ -162,7 +162,7 @@
     })
   }
 
-  const onWheel = e => {
+  const onWheel = (e: { deltaY?: any; clientX?: any; clientY?: any }) => {
     const point = getMousePoint(e)
     const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
     setNewZoom(newZoom, point)
