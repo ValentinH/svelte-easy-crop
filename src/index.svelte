@@ -1,8 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
-  import { DispatchPixels } from './cropper'
   import * as helpers from './helpers'
-  import { Crop, CropShape, CropSize, CrossOrigin, DispatchPercent } from '/src/cropper'
+  import { Crop, DispatchPixels, CropShape, CropSize, CrossOrigin, DispatchPercent } from '/src/cropper'
   
   export let image: string;
   export let crop: Crop = { x: 0, y: 0 }
