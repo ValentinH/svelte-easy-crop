@@ -10,4 +10,18 @@ export interface Crop {
   y: number
 }
 
+export interface DispatchPixels {
+  x: any
+  y: any
+  width: number | any
+  height: any
+}
+
+export interface DispatchPercent {
+  x: any
+  y: any
+  width: any
+  height: any
+}
+
 export type CrossOrigin = '' | 'anonymous' | 'use-credentials'

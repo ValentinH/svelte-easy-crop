@@ -1,7 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import { DispatchPixels } from './cropper'
   import * as helpers from './helpers'
-  import { Crop, CropShape, CropSize, CrossOrigin } from '/src/cropper'
+  import { Crop, CropShape, CropSize, CrossOrigin, DispatchPercent } from '/src/cropper'
   
   export let image: string;
   export let crop: Crop = { x: 0, y: 0 }
@@ -27,7 +28,7 @@
   let rafDragTimeout = null
   let rafZoomTimeout = null
 
-  const dispatch = createEventDispatcher()
+  const dispatch = createEventDispatcher<{percent: DispatchPercent, pixels: DispatchPixels}>()
 
   onMount(() => {
     // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
