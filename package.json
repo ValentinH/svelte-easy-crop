@@ -32,8 +32,7 @@
     "e2e:ci": "start-server-and-test dev http://localhost:3000 cy:ci",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:ci": "cypress run --record",
-    "npm:publish": "np --contents package"
+    "cy:ci": "cypress run --record"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^1.0.2",
@@ -46,7 +45,6 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-svelte3": "^4.0.0",
-    "np": "^7.6.3",
     "prettier": "^2.8.0",
     "prettier-plugin-svelte": "^2.8.1",
     "query-string": "^8.1.0",
