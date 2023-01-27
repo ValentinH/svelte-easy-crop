@@ -1,6 +1,6 @@
 export type CropShape = 'rect' | 'round'
 
-export interface CropSize {
+export interface Size {
   width: number
   height: number
 }

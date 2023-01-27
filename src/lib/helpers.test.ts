@@ -1,4 +1,5 @@
 import * as helpers from './helpers'
+import { describe, test, expect } from 'vitest'
 
 describe('Helpers', () => {
   describe('getCropSize', () => {
@@ -139,11 +140,31 @@ describe('Helpers', () => {
     })
 
     test.each([
-      [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 50, y: 0 }],
-      [{ x: 0, y: 0 }, { x: 0, y: 100 }, { x: 0, y: 50 }],
-      [{ x: 0, y: 0 }, { x: 100, y: 100 }, { x: 50, y: 50 }],
-      [{ x: 100, y: 1000 }, { x: 0, y: 400 }, { x: 50, y: 700 }],
-      [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }],
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 50, y: 0 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 0, y: 100 },
+        { x: 0, y: 50 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 100 },
+        { x: 50, y: 50 },
+      ],
+      [
+        { x: 100, y: 1000 },
+        { x: 0, y: 400 },
+        { x: 50, y: 700 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: 0, y: 0 },
+        { x: 0, y: 0 },
+      ],
     ])('.getCenter(%o, %o)', (a, b, expected) => {
       const center = helpers.getCenter(a, b)
       expect(center).toEqual(expected)

@@ -2,22 +2,22 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import type { HTMLImgAttributes } from 'svelte/elements/index'
   import * as helpers from './helpers'
-  import type { Point, CropShape, CropSize, DispatchEvents, ImageSize } from './types'
+  import type { Point, CropShape, Size, DispatchEvents, ImageSize } from './types'
 
   export let image: string
   export let crop: Point = { x: 0, y: 0 }
-  export let zoom: number = 1
-  export let aspect: number = 4 / 3
-  export let minZoom: number = 1
-  export let maxZoom: number = 3
-  export let cropSize: CropSize | null = null
+  export let zoom = 1
+  export let aspect = 4 / 3
+  export let minZoom = 1
+  export let maxZoom = 3
+  export let cropSize: Size | null = null
   export let cropShape: CropShape = 'rect'
-  export let showGrid: boolean = true
-  export let zoomSpeed: number = 1
+  export let showGrid = true
+  export let zoomSpeed = 1
   export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
-  export let restrictPosition: boolean = true
+  export let restrictPosition = true
 
-  let cropperSize: CropSize | null = null
+  let cropperSize: Size | null = null
   let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
   let containerEl: HTMLDivElement | null = null
   let containerRect: DOMRect | null = null
@@ -155,14 +155,14 @@
     emitCropData()
   }
 
-  const onPinchStart = (e: { touches: any }) => {
+  const onPinchStart = (e: TouchEvent) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     lastPinchDistance = helpers.getDistanceBetweenPoints(pointA, pointB)
     onDragStart(helpers.getCenter(pointA, pointB))
   }
 
-  const onPinchMove = (e: { preventDefault?: () => void; touches: any }) => {
+  const onPinchMove = (e: TouchEvent) => {
     const pointA = getTouchPoint(e.touches[0])
     const pointB = getTouchPoint(e.touches[1])
     const center = helpers.getCenter(pointA, pointB)

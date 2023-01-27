@@ -1,4 +1,4 @@
-import type { CropSize, ImageSize, Point } from './types'
+import type { Size, ImageSize, Point } from './types'
 
 /**
  * Compute the dimension of the crop area based on image size and aspect ratio
@@ -29,8 +29,8 @@ export function getCropSize(imgWidth: number, imgHeight: number, aspect: number)
  */
 export function restrictPosition(
   position: Point,
-  imageSize: ImageSize,
-  cropSize: CropSize,
+  imageSize: Size,
+  cropSize: Size,
   zoom: number
 ): Point {
   return {
@@ -66,7 +66,7 @@ export function getDistanceBetweenPoints(pointA: Point, pointB: Point) {
 export function computeCroppedArea(
   crop: Point,
   imgSize: ImageSize,
-  cropSize: CropSize,
+  cropSize: Size,
   aspect: number,
   zoom: number,
   restrictPosition = true
