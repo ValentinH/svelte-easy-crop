@@ -23,7 +23,6 @@ jobs:
           restore-keys: |
             yarn-deps-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
-
       - name: Run Checks
         run: yarn check
 
@@ -31,7 +30,7 @@ jobs:
         run: yarn unit
 
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.5 
+        uses: cypress-io/github-action@v5.0.5
         with:
           build: yarn build
           start: yarn dev

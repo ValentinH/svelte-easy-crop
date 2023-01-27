@@ -13,8 +13,14 @@ Cypress.Commands.add('dragAndDropWithTouch', { prevSubject: 'element' }, (subjec
 })
 
 Cypress.Commands.add('pinch', { prevSubject: 'element' }, (subject, options) => {
-  const startTouches = [{ clientX: 0, clientY: 0 }, { clientX: 0, clientY: 10 }]
-  const moveTouches = [{ clientX: 0, clientY: 0 }, { clientX: 0, clientY: 10 + options.distance }]
+  const startTouches = [
+    { clientX: 0, clientY: 0 },
+    { clientX: 0, clientY: 10 },
+  ]
+  const moveTouches = [
+    { clientX: 0, clientY: 0 },
+    { clientX: 0, clientY: 10 + options.distance },
+  ]
   cy.wrap(subject)
     .trigger('touchstart', { touches: startTouches })
     .trigger('touchmove', { touches: moveTouches })

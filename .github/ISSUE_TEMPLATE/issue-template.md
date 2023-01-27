@@ -1,7 +1,6 @@
 ---
 name: Issue template
 about: Describe this issue template's purpose here.
-
 ---
 
 ## Are you reporting a bug?
