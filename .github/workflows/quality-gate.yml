@@ -2,6 +2,7 @@ name: Quality Gate
 
 on: [pull_request]
 
+
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
@@ -34,3 +35,6 @@ jobs:
         with:
           build: yarn build
           start: yarn dev
+          record: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
