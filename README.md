@@ -4,7 +4,7 @@ A Svelte component to crop images with easy interactions
 
 This is a rewrite of `react-easy-crop` (https://github.com/ricardo-ch/react-easy-crop).
 
-[![version][version-badge]][package] [![Monthly downloads][npmstats-badge]][npmstats] ![gzip size][gzip-badge] [![Build Status][build-badge]][build-page] [![MIT License][license-badge]][license] [![PRs Welcome][prs-badge]][prs]
+[![version][version-badge]][package] [![Monthly downloads][npmstats-badge]][npmstats] ![gzip size][gzip-badge]  [![MIT License][license-badge]][license] [![PRs Welcome][prs-badge]][prs]
 
 ![svelte-easy-crop Demo](https://user-images.githubusercontent.com/2678610/41561426-365e7a44-734a-11e8-8e0e-1c04251f53e4.gif)
 
@@ -116,5 +116,3 @@ Now, open `http://localhost:5000` and start hacking!
 [license]: https://github.com/ValentinH/svelte-easy-crop/blob/master/LICENSE
 [prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square
 [prs]: http://makeapullrequest.com
-[build-badge]: https://circleci.com/gh/ValentinH/svelte-easy-crop.svg?style=svg
-[build-page]: https://circleci.com/gh/ValentinH/svelte-easy-crop
