@@ -2,7 +2,7 @@
 
 A Svelte component to crop images with easy interactions
 
-This is a rewrite of `react-easy-crop` (https://github.com/ricardo-ch/react-easy-crop).
+This is a rewrite of `react-easy-crop` (https://github.com/valentinh/react-easy-crop).
 
 [![version][version-badge]][package] [![Monthly downloads][npmstats-badge]][npmstats] ![gzip size][gzip-badge]  [![MIT License][license-badge]][license] [![PRs Welcome][prs-badge]][prs]
 
