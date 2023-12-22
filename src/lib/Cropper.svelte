@@ -16,7 +16,7 @@
   export let zoomSpeed = 1
   export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
   export let restrictPosition = true
-  export let tabindex: number | undefined
+  export let tabindex: number | undefined = undefined
 
   let cropperSize: Size | null = null
   let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
