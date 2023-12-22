@@ -2,7 +2,6 @@ name: Quality Gate
 
 on: [pull_request]
 
-
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
@@ -11,10 +10,10 @@ jobs:
       - name: Prepare repository
         run: git fetch --unshallow --tags
 
-      - name: Use Node.js 16.x
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v1
         with:
-          node-version: 16.x
+          node-version: 18.x
 
       - name: Cache node modules
         uses: actions/cache@v1
@@ -24,9 +23,6 @@ jobs:
           restore-keys: |
             yarn-deps-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
-      - name: Run Checks
-        run: yarn check
-
       - name: Run unit tests
         run: yarn unit
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
-  import type { HTMLImgAttributes } from 'svelte/elements/index'
+  import type { HTMLImgAttributes } from 'svelte/elements'
   import * as helpers from './helpers'
   import type { Point, CropShape, Size, DispatchEvents, ImageSize } from './types'
 
@@ -16,6 +16,7 @@
   export let zoomSpeed = 1
   export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
   export let restrictPosition = true
+  export let tabindex: number | undefined = undefined
 
   let cropperSize: Size | null = null
   let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
@@ -251,6 +252,8 @@
   on:mousedown|preventDefault={onMouseDown}
   on:touchstart|preventDefault={onTouchStart}
   on:wheel|preventDefault={onWheel}
+  {tabindex}
+  role="button"
   data-testid="container"
 >
   <img
