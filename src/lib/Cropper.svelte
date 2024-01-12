@@ -30,7 +30,7 @@
   let rafDragTimeout: number | null = null
   let rafZoomTimeout: number | null = null
 
-  const imageObjectFitClass = {"contain": 'image_contain', "cover": "image_cover", "horizontal-cover": "image_horizontal_cover", 'vertical-cover': "image_vertical_cover"};
+  const imageObjectFitClass = {"contain": 'image_contain', "horizontal-cover": "image_horizontal_cover", 'vertical-cover': "image_vertical_cover"};
   const dispatch = createEventDispatcher<DispatchEvents>()
 
   onMount(() => {
@@ -296,14 +296,6 @@
   }
 
   .image {
-    max-width: 100%;
-    max-height: 100%;
-    margin: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
     will-change: transform;
   }
 
