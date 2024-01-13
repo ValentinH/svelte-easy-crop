@@ -145,6 +145,18 @@
         y: dragStartCrop.y + offsetY,
       }
 
+      // Allow free movement of the image inside the crop area if zoom is less than 1
+      // But limit the image to inside the cropBox
+      if (zoom < 1) {
+        const x_limit = cropperSize.width / 2 - ((imageSize.width * zoom) / 2);
+        const y_limit = cropperSize.height / 2 - ((imageSize.height * zoom) / 2);
+
+        let new_pos_x = Math.min(x_limit, Math.max(requestedPosition.x, -x_limit));
+        let new_pos_y = Math.min(y_limit, Math.max(requestedPosition.y, -y_limit));
+        crop = {x: new_pos_x, y: new_pos_y}
+        return;
+      }
+
       crop = restrictPosition
         ? helpers.restrictPosition(requestedPosition, imageSize, cropperSize, zoom)
         : requestedPosition
