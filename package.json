@@ -1,6 +1,6 @@
 {
   "name": "svelte-easy-crop",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "A Svelte component to crop images with easy interactions",
   "homepage": "https://github.com/ValentinH/svelte-easy-crop",
   "repository": {
