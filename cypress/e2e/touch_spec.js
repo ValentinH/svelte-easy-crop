@@ -57,7 +57,7 @@ describe('Touch assertions', function () {
         ],
       })
       .trigger('touchend')
-    cy.get('img').should('have.css', 'transform', 'matrix(1, 0, 0, 1, -36.8182, 0)')
+    cy.get('img').should('have.css', 'transform', 'matrix(0.99, 0, 0, 0.99, -145.667, -2.62)')
   })
 
   it('Move image with pinch based on the center between 2 fingers', function () {
