@@ -65,7 +65,7 @@ export function getDistanceBetweenPoints(pointA: Point, pointB: Point) {
  * Compute the output cropped area of the image in percentages and pixels.
  * x/y are the top-left coordinates on the src image
  * @param  crop x/y position of the current center of the image
- * @param  imageSize width/height of the src image (default is size on the screen, natural is the original size)
+ * @param  imgSize width/height of the src image (default is size on the screen, natural is the original size)
  * @param  cropSize width/height of the crop area
  * @param aspect aspect value
  * @param zoom zoom value
