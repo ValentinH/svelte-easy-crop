@@ -198,7 +198,8 @@
 
   const onWheel = (e: WheelEvent) => {
     const point = getMousePoint(e)
-    const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
+    // const newZoom = zoom - (e.deltaY * zoomSpeed) / 200 // Can give 1.01 due to rounding errors
+    const newZoom = (e.deltaY > 0) ? zoom - (zoomSpeed / 2) : zoom + (zoomSpeed / 2);
     setNewZoom(newZoom, point)
   }
 
