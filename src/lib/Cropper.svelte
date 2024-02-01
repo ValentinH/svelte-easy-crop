@@ -18,6 +18,7 @@
   export let restrictPosition = true
   export let tabindex: number | undefined = undefined
   export let objectFit: ObjectFit = 'contain'
+  export let mediaObjectFit: ObjectFit = objectFit
 
   let cropperSize: Size | null = null
   let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
@@ -30,7 +31,7 @@
   let rafDragTimeout: number | null = null
   let rafZoomTimeout: number | null = null
 
-  const imageObjectFitClass = {"contain": 'image_contain', "horizontal-cover": "image_horizontal_cover", 'vertical-cover': "image_vertical_cover"};
+  const imageObjectFitClass = {"contain": 'image_contain', "cover": "horizontal-cover", "horizontal-cover": "image_horizontal_cover", 'vertical-cover': "image_vertical_cover"};
   const dispatch = createEventDispatcher<DispatchEvents>()
 
   onMount(() => {
@@ -65,6 +66,7 @@
   }
 
   const onImgLoad = () => {
+    mediaObjectFit = getObjectFit()
     computeSizes()
     emitCropData()
   }
@@ -74,6 +76,20 @@
       return cropSize.width / cropSize.height
     }
     return aspect
+  }
+
+  const getObjectFit = () => {
+    if (objectFit === 'cover') {
+      if (imgEl && containerRect) {
+        const containerAspect = containerRect.width / containerRect.height;
+        const mediaAspect = imgEl.naturalWidth / imgEl.naturalHeight;
+
+        return mediaAspect < containerAspect ? 'horizontal-cover' : 'vertical-cover'
+      }
+      return 'horizontal-cover'
+    }
+
+    return objectFit;
   }
 
   const computeSizes = () => {
@@ -241,11 +257,15 @@
   //when aspect changes, we reset the cropperSize
   $: if (imgEl) {
     cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
+    const newObjectFit = getObjectFit();
+    if (newObjectFit !== mediaObjectFit) {
+      mediaObjectFit = newObjectFit;
+    }
   }
 
   // when zoom changes, we recompute the cropped area
   $: zoom && emitCropData()
-  $: classes = 'image ' + imageObjectFitClass[objectFit];
+  $: classes = 'image ' + imageObjectFitClass[mediaObjectFit];
 </script>
 
 <svelte:window on:resize={computeSizes} />

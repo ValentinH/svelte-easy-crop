@@ -1,5 +1,5 @@
 export type CropShape = 'rect' | 'round'
-export type ObjectFit = 'contain' | 'horizontal-cover' | 'vertical-cover'
+export type ObjectFit = 'contain' | 'cover' | 'horizontal-cover' | 'vertical-cover'
 
 export interface Size {
   width: number
