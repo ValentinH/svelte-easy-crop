@@ -11,7 +11,6 @@ This is a rewrite of `react-easy-crop` (https://github.com/valentinh/react-easy-
 ## Demo
 
 - [Basic example](https://codesandbox.io/s/svelte-easy-crop-basic-demo-q1005?file=/App.svelte)
-- [With file upload and live preview](https://codesandbox.io/s/svelte-easy-crop-with-file-upload-and-live-preview-36xsr)
 
 ## Features
 
