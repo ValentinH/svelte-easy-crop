@@ -2,7 +2,7 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import type { HTMLImgAttributes } from 'svelte/elements'
   import * as helpers from './helpers'
-  import type { Point, CropShape, Size, DispatchEvents, ImageSize } from './types'
+  import type { Point, CropShape, Size, DispatchEvents, ImageSize, ObjectFit } from './types'
 
   export let image: string
   export let crop: Point = { x: 0, y: 0 }
@@ -17,6 +17,8 @@
   export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
   export let restrictPosition = true
   export let tabindex: number | undefined = undefined
+  export let objectFit: ObjectFit = 'contain'
+  export let mediaObjectFit: ObjectFit = objectFit
 
   let cropperSize: Size | null = null
   let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
@@ -29,6 +31,7 @@
   let rafDragTimeout: number | null = null
   let rafZoomTimeout: number | null = null
 
+  const imageObjectFitClass = {"contain": 'image_contain', "cover": "horizontal-cover", "horizontal-cover": "image_horizontal_cover", 'vertical-cover': "image_vertical_cover"};
   const dispatch = createEventDispatcher<DispatchEvents>()
 
   onMount(() => {
@@ -63,6 +66,7 @@
   }
 
   const onImgLoad = () => {
+    mediaObjectFit = getObjectFit()
     computeSizes()
     emitCropData()
   }
@@ -72,6 +76,20 @@
       return cropSize.width / cropSize.height
     }
     return aspect
+  }
+
+  const getObjectFit = () => {
+    if (objectFit === 'cover') {
+      if (imgEl && containerRect) {
+        const containerAspect = containerRect.width / containerRect.height;
+        const mediaAspect = imgEl.naturalWidth / imgEl.naturalHeight;
+
+        return mediaAspect < containerAspect ? 'horizontal-cover' : 'vertical-cover'
+      }
+      return 'horizontal-cover'
+    }
+
+    return objectFit;
   }
 
   const computeSizes = () => {
@@ -180,7 +198,8 @@
 
   const onWheel = (e: WheelEvent) => {
     const point = getMousePoint(e)
-    const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
+    // const newZoom = zoom - (e.deltaY * zoomSpeed) / 200 // Can give 1.01 due to rounding errors
+    const newZoom = (e.deltaY > 0) ? zoom - (zoomSpeed / 2) : zoom + (zoomSpeed / 2);
     setNewZoom(newZoom, point)
   }
 
@@ -239,10 +258,15 @@
   //when aspect changes, we reset the cropperSize
   $: if (imgEl) {
     cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
+    const newObjectFit = getObjectFit();
+    if (newObjectFit !== mediaObjectFit) {
+      mediaObjectFit = newObjectFit;
+    }
   }
 
   // when zoom changes, we recompute the cropped area
   $: zoom && emitCropData()
+  $: classes = 'image ' + imageObjectFitClass[mediaObjectFit];
 </script>
 
 <svelte:window on:resize={computeSizes} />
@@ -258,7 +282,7 @@
 >
   <img
     bind:this={imgEl}
-    class="image"
+    class={classes}
     src={image}
     on:load={onImgLoad}
     alt=""
@@ -287,18 +311,32 @@
     user-select: none;
     touch-action: none;
     cursor: move;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .image {
-    max-width: 100%;
-    max-height: 100%;
-    margin: auto;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
     will-change: transform;
+  }
+
+  .image_contain {
+      max-width: 100%;
+      max-height: 100%;
+      margin: auto;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+  }
+  .image_horizontal_cover {
+      width: 100%;
+      height: auto;
+  }
+  .image_vertical_cover {
+      width: auto;
+      height: 100%;
   }
 
   .cropperArea {
