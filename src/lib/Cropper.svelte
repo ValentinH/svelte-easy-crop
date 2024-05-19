@@ -252,7 +252,7 @@
 
 <svelte:window on:resize={computeSizes} />
 <div
-  class="container"
+  class="cropper-container"
   bind:this={containerEl}
   on:mousedown|preventDefault={onMouseDown}
   on:touchstart|nonpassive|preventDefault={onTouchStart}
@@ -263,7 +263,7 @@
 >
   <img
     bind:this={imgEl}
-    class="image"
+    class="cropper-image"
     src={image}
     on:load={onImgLoad}
     alt=""
@@ -272,9 +272,9 @@
   />
   {#if cropperSize}
     <div
-      class="cropperArea"
-      class:round={cropShape === 'round'}
-      class:grid={showGrid}
+      class="cropper-area"
+      class:cropper-round={cropShape === 'round'}
+      class:cropper-grid={showGrid}
       style="width: {cropperSize.width}px; height: {cropperSize.height}px;"
       data-testid="cropper"
     />
@@ -282,7 +282,7 @@
 </div>
 
 <style>
-  .container {
+  .cropper-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -294,7 +294,7 @@
     cursor: move;
   }
 
-  .image {
+  .cropper-image {
     max-width: 100%;
     max-height: 100%;
     margin: auto;
@@ -306,7 +306,7 @@
     will-change: transform;
   }
 
-  .cropperArea {
+  .cropper-area {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -318,7 +318,7 @@
     overflow: hidden;
   }
 
-  .grid:before {
+  .cropper-grid:before {
     content: ' ';
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -331,7 +331,7 @@
     border-bottom: 0;
   }
 
-  .grid:after {
+  .cropper-grid:after {
     content: ' ';
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -344,7 +344,7 @@
     border-right: 0;
   }
 
-  .round {
+  .cropper-round {
     border-radius: 50%;
   }
 </style>
