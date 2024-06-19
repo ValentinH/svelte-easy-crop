@@ -2,7 +2,7 @@
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
   import type { HTMLImgAttributes } from 'svelte/elements'
   import * as helpers from './helpers'
-  import type { Point, CropShape, Size, DispatchEvents, ImageSize } from './types'
+  import type { CropShape, DispatchEvents, ImageSize, Point, Size } from './types'
 
   export let image: string
   export let crop: Point = { x: 0, y: 0 }
@@ -250,8 +250,8 @@
   class="container"
   bind:this={containerEl}
   on:mousedown|preventDefault={onMouseDown}
-  on:touchstart|preventDefault={onTouchStart}
-  on:wheel|preventDefault={onWheel}
+  on:touchstart|nonpassive|preventDefault={onTouchStart}
+  on:wheel|nonpassive|preventDefault={onWheel}
   {tabindex}
   role="button"
   data-testid="container"
