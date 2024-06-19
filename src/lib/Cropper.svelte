@@ -252,7 +252,7 @@
 
 <svelte:window on:resize={computeSizes} />
 <div
-  class="cropper-container"
+  class="svelte-easy-crop-container"
   bind:this={containerEl}
   on:mousedown|preventDefault={onMouseDown}
   on:touchstart|nonpassive|preventDefault={onTouchStart}
@@ -263,7 +263,7 @@
 >
   <img
     bind:this={imgEl}
-    class="cropper-image"
+    class="svelte-easy-crop-image"
     src={image}
     on:load={onImgLoad}
     alt=""
@@ -272,9 +272,9 @@
   />
   {#if cropperSize}
     <div
-      class="cropper-area"
-      class:cropper-round={cropShape === 'round'}
-      class:cropper-grid={showGrid}
+      class="svelte-easy-crop-area"
+      class:svelte-easy-crop-round={cropShape === 'round'}
+      class:svelte-easy-crop-grid={showGrid}
       style="width: {cropperSize.width}px; height: {cropperSize.height}px;"
       data-testid="cropper"
     />
@@ -282,7 +282,7 @@
 </div>
 
 <style>
-  .cropper-container {
+  .svelte-easy-crop-container {
     position: absolute;
     top: 0;
     left: 0;
@@ -294,7 +294,7 @@
     cursor: move;
   }
 
-  .cropper-image {
+  .svelte-easy-crop-image {
     max-width: 100%;
     max-height: 100%;
     margin: auto;
@@ -306,7 +306,7 @@
     will-change: transform;
   }
 
-  .cropper-area {
+  .svelte-easy-crop-area {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -318,7 +318,7 @@
     overflow: hidden;
   }
 
-  .cropper-grid:before {
+  .svelte-easy-crop-grid:before {
     content: ' ';
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -331,7 +331,7 @@
     border-bottom: 0;
   }
 
-  .cropper-grid:after {
+  .svelte-easy-crop-grid:after {
     content: ' ';
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -344,7 +344,7 @@
     border-right: 0;
   }
 
-  .cropper-round {
+  .svelte-easy-crop-round {
     border-radius: 50%;
   }
 </style>
