@@ -243,6 +243,11 @@
 
   // when zoom changes, we recompute the cropped area
   $: zoom && emitCropData()
+
+  $: if(aspect) {
+    computeSizes()
+    emitCropData()
+  } 
 </script>
 
 <svelte:window on:resize={computeSizes} />
