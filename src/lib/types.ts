@@ -1,4 +1,23 @@
+import type { HTMLImgAttributes } from 'svelte/elements'
+
 export type CropShape = 'rect' | 'round'
+
+export type CropperProps = {
+  image: string
+  crop: Point
+  zoom: number
+  aspect: number
+  minZoom: number
+  maxZoom: number
+  cropSize: Size | null
+  cropShape: CropShape
+  showGrid: boolean
+  zoomSpeed: number
+  crossOrigin: HTMLImgAttributes['crossorigin']
+  restrictPosition: boolean
+  tabindex: number | undefined
+  oncropcomplete: (event: DispatchEvents['cropcomplete']) => void
+}
 
 export interface Size {
   width: number
