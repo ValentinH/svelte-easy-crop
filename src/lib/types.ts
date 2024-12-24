@@ -2,6 +2,9 @@ import type { HTMLImgAttributes } from 'svelte/elements'
 
 export type CropShape = 'rect' | 'round'
 
+export type OnCropCompleteEvent = { percent: CropArea; pixels: CropArea }
+export type OnCropComplete = (event: OnCropCompleteEvent) => void
+
 export type CropperProps = {
   image: string
   crop: Point
@@ -16,7 +19,7 @@ export type CropperProps = {
   crossOrigin: HTMLImgAttributes['crossorigin']
   restrictPosition: boolean
   tabindex: number | undefined
-  oncropcomplete: (event: DispatchEvents['cropcomplete']) => void
+  oncropcomplete: OnCropComplete
 }
 
 export interface Size {
