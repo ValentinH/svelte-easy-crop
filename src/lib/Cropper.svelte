@@ -266,9 +266,9 @@
 
   const containerAction: Action<HTMLDivElement> = node => {
     $effect(() => {
-      node.addEventListener('touchstart', onTouchStart, { passive: false })
+      node.addEventListener('touchstart', onTouchStart)
       node.addEventListener('mousedown', onMouseDown)
-      node.addEventListener('wheel', onWheel)
+      node.addEventListener('wheel', onWheel, { passive: false })
 
       return () => {
         node.removeEventListener('touchstart', onTouchStart)
