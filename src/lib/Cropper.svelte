@@ -248,18 +248,17 @@
   })
 
   // when zoom changes, we recompute the cropped area
-  let lastZoom = $state(zoom);
   $effect(() => {
-    if (zoom !== lastZoom) {
-      lastZoom = zoom;
+    if (zoom) {
       emitCropData()
     }
   })
 
-  let lastAspect = $state(aspect);
+  // this variable is required to prevent the effect into entering an infinite loop (https://github.com/ValentinH/svelte-easy-crop/pull/59#discussion_r1896254867)
+  let lastAspect = $state(aspect)
   $effect(() => {
     if (aspect !== lastAspect) {
-      lastAspect = aspect;
+      lastAspect = aspect
       computeSizes()
       emitCropData()
     }
