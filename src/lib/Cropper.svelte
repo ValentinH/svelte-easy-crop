@@ -254,16 +254,6 @@
     }
   })
 
-  // this variable is required to prevent the effect into entering an infinite loop (https://github.com/ValentinH/svelte-easy-crop/pull/59#discussion_r1896254867)
-  let lastAspect = $state(aspect)
-  $effect(() => {
-    if (aspect !== lastAspect) {
-      lastAspect = aspect
-      computeSizes()
-      emitCropData()
-    }
-  })
-
   const containerAction: Action<HTMLDivElement> = node => {
     $effect(() => {
       node.addEventListener('touchstart', onTouchStart)
