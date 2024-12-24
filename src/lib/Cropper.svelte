@@ -261,24 +261,27 @@
       emitCropData()
     }
   })
+
+  const containerAction: Action<HTMLDivElement> = node => {
+    $effect(() => {
+      node.addEventListener('touchstart', onTouchStart, { passive: false })
+      node.addEventListener('mousedown', onMouseDown)
+      node.addEventListener('wheel', onWheel)
+
+      return () => {
+        node.removeEventListener('touchstart', onTouchStart)
+        node.removeEventListener('mousedown', onMouseDown)
+        node.removeEventListener('wheel', onWheel)
+      }
+    })
+  }
 </script>
 
 <svelte:window on:resize={computeSizes} />
 <div
   class="svelte-easy-crop-container"
   bind:this={containerEl}
-  onmousedown={(e) => {
-    e.preventDefault()
-    onMouseDown(e)
-  }}
-  ontouchstart={(e) => {
-    e.preventDefault()
-    onTouchStart(e)
-  }}
-  onwheel={(e) => {
-    e.preventDefault();
-    onWheel(e)
-  }}
+  use:containerAction
   {tabindex}
   role="button"
   data-testid="container"
