@@ -101,6 +101,7 @@
   })
 
   const onMouseDown = (e: MouseEvent) => {
+    e.preventDefault()
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onDragStopped)
     onDragStart(getMousePoint(e))
@@ -109,6 +110,7 @@
   const onMouseMove = (e: MouseEvent) => onDrag(getMousePoint(e))
 
   const onTouchStart = (e: TouchEvent) => {
+    e.preventDefault()
     document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
     document.addEventListener('touchend', onDragStopped)
 
@@ -180,6 +182,7 @@
   }
 
   const onWheel = (e: WheelEvent) => {
+    e.preventDefault()
     const point = getMousePoint(e)
     const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
     setNewZoom(newZoom, point)
