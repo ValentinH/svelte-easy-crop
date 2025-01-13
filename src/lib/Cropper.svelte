@@ -1,35 +1,36 @@
 <script lang="ts">
-  import { createEventDispatcher, onDestroy, onMount } from 'svelte'
-  import type { HTMLImgAttributes } from 'svelte/elements'
+  import { onDestroy, onMount } from 'svelte'
   import * as helpers from './helpers'
-  import type { CropShape, DispatchEvents, ImageSize, Point, Size } from './types'
+  import type { ImageSize, Point, CropperProps, Size } from './types'
+  import type { Action } from 'svelte/action'
 
-  export let image: string
-  export let crop: Point = { x: 0, y: 0 }
-  export let zoom = 1
-  export let aspect = 4 / 3
-  export let minZoom = 1
-  export let maxZoom = 3
-  export let cropSize: Size | null = null
-  export let cropShape: CropShape = 'rect'
-  export let showGrid = true
-  export let zoomSpeed = 1
-  export let crossOrigin: HTMLImgAttributes['crossorigin'] = null
-  export let restrictPosition = true
-  export let tabindex: number | undefined = undefined
+  let {
+    image,
+    crop = $bindable({ x: 0, y: 0 }),
+    zoom = $bindable(1),
+    minZoom = $bindable(1),
+    maxZoom = $bindable(3),
+    aspect = 4 / 3,
+    cropSize = null,
+    cropShape = 'rect',
+    showGrid = true,
+    zoomSpeed = 1,
+    crossOrigin = null,
+    restrictPosition = true,
+    tabindex = undefined,
+    oncropcomplete,
+  }: Partial<CropperProps> = $props()
 
-  let cropperSize: Size | null = null
-  let imageSize: ImageSize = { width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 }
-  let containerEl: HTMLDivElement | null = null
-  let containerRect: DOMRect | null = null
-  let imgEl: HTMLImageElement | null = null
-  let dragStartPosition: Point = { x: 0, y: 0 }
-  let dragStartCrop: Point = { x: 0, y: 0 }
-  let lastPinchDistance = 0
-  let rafDragTimeout: number | null = null
-  let rafZoomTimeout: number | null = null
-
-  const dispatch = createEventDispatcher<DispatchEvents>()
+  let cropperSize = $state<Size | null>(null)
+  let imageSize = $state<ImageSize>({ width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 })
+  let containerEl = $state<HTMLDivElement | null>(null)
+  let containerRect = $state<DOMRect | null>(null)
+  let imgEl = $state<HTMLImageElement | null>(null)
+  let dragStartPosition = $state<Point>({ x: 0, y: 0 })
+  let dragStartCrop = $state<Point>({ x: 0, y: 0 })
+  let lastPinchDistance = $state(0)
+  let rafDragTimeout = $state<number | null>(null)
+  let rafZoomTimeout = $state<number | null>(null)
 
   onMount(() => {
     // when rendered via SSR, the image can already be loaded and its onLoad callback will never be called
@@ -100,6 +101,7 @@
   })
 
   const onMouseDown = (e: MouseEvent) => {
+    e.preventDefault()
     document.addEventListener('mousemove', onMouseMove)
     document.addEventListener('mouseup', onDragStopped)
     onDragStart(getMousePoint(e))
@@ -108,6 +110,7 @@
   const onMouseMove = (e: MouseEvent) => onDrag(getMousePoint(e))
 
   const onTouchStart = (e: TouchEvent) => {
+    e.preventDefault()
     document.addEventListener('touchmove', onTouchMove, { passive: false }) // iOS 11 now defaults to passive: true
     document.addEventListener('touchend', onDragStopped)
 
@@ -179,6 +182,7 @@
   }
 
   const onWheel = (e: WheelEvent) => {
+    e.preventDefault()
     const point = getMousePoint(e)
     const newZoom = zoom - (e.deltaY * zoomSpeed) / 200
     setNewZoom(newZoom, point)
@@ -229,7 +233,7 @@
       restrictPosition
     )
 
-    dispatch('cropcomplete', {
+    oncropcomplete?.({
       percent: croppedAreaPercentages,
       pixels: croppedAreaPixels,
     })
@@ -237,26 +241,39 @@
 
   // ------ Reactive statement ------
   //when aspect changes, we reset the cropperSize
-  $: if (imgEl) {
-    cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
-  }
+  $effect(() => {
+    if (imgEl) {
+      cropperSize = cropSize ? cropSize : helpers.getCropSize(imgEl.width, imgEl.height, aspect)
+    }
+  })
 
   // when zoom changes, we recompute the cropped area
-  $: zoom && emitCropData()
+  $effect(() => {
+    if (zoom) {
+      emitCropData()
+    }
+  })
 
-  $: if(aspect) {
-    computeSizes()
-    emitCropData()
-  } 
+  const containerAction: Action<HTMLDivElement> = node => {
+    $effect(() => {
+      node.addEventListener('touchstart', onTouchStart)
+      node.addEventListener('mousedown', onMouseDown)
+      node.addEventListener('wheel', onWheel, { passive: false })
+
+      return () => {
+        node.removeEventListener('touchstart', onTouchStart)
+        node.removeEventListener('mousedown', onMouseDown)
+        node.removeEventListener('wheel', onWheel)
+      }
+    })
+  }
 </script>
 
 <svelte:window on:resize={computeSizes} />
 <div
   class="svelte-easy-crop-container"
   bind:this={containerEl}
-  on:mousedown|preventDefault={onMouseDown}
-  on:touchstart|nonpassive|preventDefault={onTouchStart}
-  on:wheel|nonpassive|preventDefault={onWheel}
+  use:containerAction
   {tabindex}
   role="button"
   data-testid="container"
@@ -265,7 +282,7 @@
     bind:this={imgEl}
     class="svelte-easy-crop-image"
     src={image}
-    on:load={onImgLoad}
+    onload={onImgLoad}
     alt=""
     style="transform: translate({crop.x}px, {crop.y}px) scale({zoom});"
     crossorigin={crossOrigin}
@@ -277,7 +294,7 @@
       class:svelte-easy-crop-grid={showGrid}
       style="width: {cropperSize.width}px; height: {cropperSize.height}px;"
       data-testid="cropper"
-    />
+    ></div>
   {/if}
 </div>
 
