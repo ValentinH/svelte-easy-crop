@@ -69,12 +69,22 @@ npm install svelte-easy-crop --save
 | `zoomSpeed`        | number                              |          | Multiplies the value by which the zoom changes. Defaults to 1.                                                                                                                                                                                                                                              |
 | `crossOrigin`      | string                              |          | Allows setting the crossOrigin attribute on the image.                                                                                                                                                                                                                                                      |
 | `restrictPosition` | boolean                             |          | Whether the position of the image should be restricted to the boundaries of the cropper. Useful setting in case of `zoom < 1` or if the cropper should preserve all image content while forcing a specific aspect ratio for image throughout the application. Example: https://codesandbox.io/s/1rmqky233q. |
+| `oncropcomplete` | function(details)                             |          | This callback is the one you should use to save the cropped area of the image. |
 
-# Events
+## Callbacks
 
-#### on:cropcomplete
+### oncropcomplete
 
-This event is the one you should use to save the cropped area of the image. The `detail` property is an object with 2 values:
+```tsx
+<Cropper
+  {image}
+  bind:crop
+  bind:zoom
+  oncropcomplete={(e) => console.log(e)}
+/>
+```
+
+The `detail` property is an object with 2 values:
 
 1. `percent`: coordinates and dimensions of the cropped area in percentage of the image dimension
 1. `pixels`: coordinates and dimensions of the cropped area in pixels.
@@ -89,6 +99,7 @@ const area = {
   height: number, // height of the cropped area
 }
 ```
+
 
 ## Development
 
