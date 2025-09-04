@@ -1,4 +1,4 @@
-import type { Size, ImageSize, Point } from './types'
+import type { ImageSize, Point, Size } from './types.js'
 
 /**
  * Compute the dimension of the crop area based on image size and aspect ratio

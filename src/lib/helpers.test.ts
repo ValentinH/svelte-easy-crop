@@ -1,5 +1,5 @@
-import * as helpers from './helpers'
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
+import * as helpers from './helpers.js'
 
 describe('Helpers', () => {
   describe('getCropSize', () => {

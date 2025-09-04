@@ -1,8 +1,8 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import * as helpers from './helpers'
-  import type { ImageSize, Point, CropperProps, Size } from './types'
   import type { Action } from 'svelte/action'
+  import * as helpers from './helpers.js'
+  import type { CropperProps, ImageSize, Point, Size } from './types.js'
 
   let {
     image,

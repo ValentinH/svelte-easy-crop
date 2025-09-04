@@ -1,4 +1,4 @@
 import Cropper from './Cropper.svelte'
 
-export * from "./types"
+export * from './types.js'
 export default Cropper
