@@ -17,5 +17,5 @@
   bind:zoom
   bind:minZoom
   bind:maxZoom
-  oncropcomplete={(e) => console.log(e)}
+  oncropcomplete={e => console.log(e)}
 />

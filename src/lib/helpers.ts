@@ -46,14 +46,9 @@ function restrictPositionCoord(
   zoom: number
 ) {
   // Default max position calculation
-  let maxPosition = (imageSize * zoom) / 2 - cropSize / 2
+  const maxPosition = Math.abs((imageSize * zoom) / 2 - cropSize / 2)
 
-  // Allow free movement of the image inside the crop area if zoom is less than 1
-  // But limit the image's position to inside the cropBox
-  if (zoom < 1) {
-    maxPosition = cropSize / 2 - (imageSize * zoom) / 2
-  }
-
+  // Limit the image's position to inside the cropBox
   return Math.min(maxPosition, Math.max(position, -maxPosition))
 }
 
