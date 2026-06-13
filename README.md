@@ -50,10 +50,10 @@ npm install svelte-easy-crop --save
 </script>
 
 <Cropper
- {image}
- bind:crop
- bind:zoom
- on:cropcomplete={e => console.log(e.detail)}
+  {image}
+  bind:crop
+  bind:zoom
+  oncropcomplete={(e) => console.log(e)}
 />
 ```
 
