@@ -48,6 +48,8 @@
       containerEl.removeEventListener('gesturestart', preventZoomSafari)
       containerEl.removeEventListener('gesturechange', preventZoomSafari)
     }
+    if (rafDragTimeout) window.cancelAnimationFrame(rafDragTimeout)
+    if (rafZoomTimeout) window.cancelAnimationFrame(rafZoomTimeout)
     cleanEvents()
   })
 
@@ -204,7 +206,8 @@
   })
 
   const setNewZoom = (newZoom: number, point: Point) => {
-    if (!cropperSize) return
+    // The container is only measured once the image has loaded
+    if (!cropperSize || !containerRect) return
     const zoomPoint = getPointOnContainer(point)
     const zoomTarget = getPointOnImage(zoomPoint)
     zoom = Math.min(maxZoom, Math.max(newZoom, minZoom))
